@@ -1,0 +1,58 @@
+header {
+  position: relative;
+  height: 60px;
+  top: 0;
+  font-size: 30px;
+  padding: 10px 20px;
+  background-color: rgb(125, 175, 219);
+  color: white;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.enterprise {
+  font-size: 20px;
+}
+
+main {
+  position: absolute;
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.sidebar {
+  position: relative;
+  height: 100%;
+  transition: 200ms;
+}
+
+.sidebar > nav {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: whitesmoke;
+  height: 100%;
+}
+
+nav > a {
+  display: flex;
+  gap: 80px;
+  justify-content: space-between;
+  text-decoration: none;
+  color: black;
+  align-items: center;
+}
+
+a > i {
+  font-size: larger;
+}
+
+.content {
+  transition: 200ms;
+  position: relative;
+  padding: 10px;
+  left: 0;
+}
