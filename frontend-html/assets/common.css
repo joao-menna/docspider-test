@@ -1,3 +1,4 @@
+/* common */
 html, body {
   height: 100%;
   max-height: 100%;
@@ -21,19 +22,22 @@ header {
 }
 
 main {
-  position: absolute;
+  position: relative;
   display: flex;
   width: 100%;
-  top: 60px;
+  top: 0;
   bottom: 0;
+  height: 90vh;
 }
 
 .sidebar {
-  position: relative;
+  position: absolute;
   /* height: 100%; */
+  width: 280px;
   top: 0;
   bottom: 0;
   transition: 200ms;
+  z-index: 10;
 }
 
 .sidebar > nav {
@@ -52,6 +56,7 @@ nav > a {
   text-decoration: none;
   color: black;
   align-items: center;
+  white-space: nowrap;
 }
 
 a > i {
@@ -63,9 +68,45 @@ a > i {
   position: relative;
   padding: 10px;
   left: 0;
-  width: 78%;
+  width: 100%;
+  right: 0;
 }
 
+
+/* Home */
+.main-card {
+  border-radius: 20px;
+  margin: 20px;
+}
+
+.background {
+  position: absolute;
+  height: 70vh;
+  width: 100%;
+}
+
+.background > img {
+  width: 100%;
+  height: 70vh;
+  object-fit: cover;
+  border-radius: 20px;
+  position: absolute;
+  opacity: 0.4;
+}
+
+.inner {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 40px;
+}
+
+
+/* My Documents */
 table {
   width: 100%;
 }
@@ -73,4 +114,23 @@ table {
 .edit, .delete {
   font-size: larger;
   padding: 10px;
+}
+
+.button > i {
+  user-select: none;
+}
+
+.cards {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
 }

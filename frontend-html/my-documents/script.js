@@ -9,13 +9,14 @@
 
 let isEditing = false
 let editing = {}
+let invalidFile = false
 const BASE_URL = 'http://localhost:8080'
 
 /**
  * Delete entry before serve para deletar e atualizar
  * @param {number} id
  */
-async function deleteEntryBefore(id) {
+async function deleteEntryAction(id) {
   await deleteEntry(id)
   showList()
 }
@@ -28,7 +29,8 @@ async function showList() {
     <div>
       <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
     </div>
-    <table>
+    <div class="cards">
+    <!-- <table>
       <thead>
         <tr>
           <th>ID</th>
@@ -39,31 +41,52 @@ async function showList() {
           <th></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody> -->
   `
 
   const documentList = await getList()
 
   let list = ''
   for (const entry of documentList) {
+    // modo tabela
+    // list += `
+    //     <!-- <tr>
+    //       <td>${entry.id}</td>
+    //       <td>${entry.title}</td>
+    //       <td>${entry.description}</td>
+    //       <td>${entry.fileName}</td>
+    //       <td>${formatDate(entry.dateTime)}</td>
+    //       <td class="botoes">
+    //         <i class="bi bi-pencil button" name="showCadastro" data-arg1='${JSON.stringify(entry)}'></i>
+    //         <i class="bi bi-trash button" name="deleteEntryAction" data-arg1='${entry.id}'></i>
+    //       </td>
+    //     </tr> -->
+    // `
+    // modo card
     list += `
-        <tr>
-          <td>${entry.id}</td>
-          <td>${entry.title}</td>
-          <td>${entry.description}</td>
-          <td>${entry.fileName}</td>
-          <td>${formatDate(entry.dateTime)}</td>
-          <td class="botoes">
-            <i class="bi bi-pencil button" name="showCadastro" data-arg1='${JSON.stringify(entry)}'></i>
-            <i class="bi bi-trash button" name="deleteEntryBefore" data-arg1='${entry.id}'></i>
-          </td>
-        </tr>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">${entry.title}</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">${entry.fileName}</h6>
+          <p class="card-text">${entry.description}</p>
+          <button class="btn button" name="downloadFile" data-arg1='${entry.fileName}'>
+            <i class="bi bi-download" name="downloadFile" data-arg1='${entry.fileName}'></i>
+          </button>
+          <button class="btn button" name="showCadastro" data-arg1='${JSON.stringify(entry)}'>
+            <i class="bi bi-pencil" name="showCadastro" data-arg1='${JSON.stringify(entry)}'></i>
+          </button>
+          <button class="btn button" name="deleteEntryAction" data-arg1='${entry.id}'>
+            <i class="bi bi-trash" name="deleteEntryAction" data-arg1='${entry.id}'></i>
+          </button>
+        </div>
+      </div>
     `
   }
 
   let end = `
-      </tbody>
-    </table>
+      <!-- </tbody>
+    </table> -->
+    </div>
   `
 
   const text = `
@@ -76,11 +99,29 @@ async function showList() {
 
   document.querySelectorAll('.button').forEach((el) => {
     el.addEventListener('click', (ev) => {
+      ev.stopPropagation()
       buttonInvoke(ev)
     })
   })
 }
 
+/**
+ * Baixar arquivo
+ * @param {ListEntry} entry
+ */
+function downloadFile(entryFileName) {
+  const a = document.createElement('a')
+  a.href = `${BASE_URL}/static/${entryFileName}`
+  a.download = entryFileName
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+/**
+ * Função para quando clicar no botão
+ * @param {*} event Evento de clicar no botão
+ */
 function buttonInvoke(event) {
   let nameOfFunction = this[event.target.getAttribute('name')]
   let arg1 = event.target.getAttribute('data-arg1')
@@ -100,28 +141,63 @@ async function showCadastro(entryStr) {
 
   let text = `
     <button class="btn btn-danger" onclick="showList()">Voltar</button>
+    ${invalidFile ? '<p class="invalidFile">Arquivo inválido detectado!</p>' : ''}
     <form onsubmit="submitForm">
       <div class="title">
-        <input type="text" value="${editing.title || ''}" />
-      </div>
-
-      <div class="description">
-        <input type="text" value="${editing.description || ''}" />
+        <input id="title" type="text" value="${editing.title || ''}" required />
       </div>
 
       <div class="fileName">
-        <input type="text" value="${editing.fileName || ''}" />
+        <input id="fileName" type="text" value="${editing.fileName || ''}" required />
       </div>
 
-      ${!editing.title ? '<div class="file-input"><input type="file" /></div>' : ''}
+      <div class="description">
+        <textarea id="description" required>${editing.description || ''}</textarea>
+      </div>
+
+      ${!editing.title ? '<div class="file-input"><input id="file-input" type="file" required /></div>' : ''}
+
+      <div class="button-wrapper">
+        <button type="submit">Enviar</button>
+      </div>
     </form>
   `
 
   document.querySelector('.content').innerHTML = text
+  document.querySelector('#file-input').addEventListener('change', (ev) => {
+    onFileChange(ev)
+  })
 }
 
+/**
+ * Esta função ocorre quando é trocado o arquivo
+ * @param {*} event Evento de trocar file
+ */
+function onFileChange(event) {
+  if (event.target.files.length === 0) {
+    return
+  }
+
+  const file = event.target.files[0]
+  if (['exe', 'zip', 'bat'].includes(file.name.split('.')[file.name.split('.').length - 1])) {
+    event.target.value = ''
+    invalidFile = true
+    showCadastro()
+    return
+  }
+
+  const input = document.querySelector('#fileName')
+  input.value = file.name
+}
+
+/**
+ * Função para quando o form for enviado
+ * @param {*} event Evento de enviar form
+ */
 function submitForm(event) {
   event.preventDefault()
+  event.stopPropagation()
+  showList()
 }
 
 /**
