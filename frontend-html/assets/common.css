@@ -57,6 +57,8 @@ nav > a {
   color: black;
   align-items: center;
   white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
 }
 
 a > i {
@@ -133,4 +135,27 @@ form {
   flex-direction: column;
   gap: 10px;
   justify-content: center;
+}
+
+#title, #fileName, #description {
+  width: 100%;
+  border: 1px solid rgb(193, 193, 193);
+}
+
+.container-title {
+  display: flex;
+  gap: 10px;
+}
+
+.container-title > div {
+  width: 100%;
+}
+
+.container-title > div > input {
+  width: 100%;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: flex-end;
 }

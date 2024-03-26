@@ -26,6 +26,7 @@ async function deleteEntryAction(id) {
  */
 async function showList() {
   let start = `
+    <h4>Meus documentos</h4>
     <div>
       <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
     </div>
@@ -140,29 +141,39 @@ async function showCadastro(entryStr) {
   }
 
   let text = `
-    <button class="btn btn-danger" onclick="showList()">Voltar</button>
+    <h4>Adicionar anexo</h4>
+    <button class="btn btn-secondary" onclick="showList()">Voltar</button>
     ${invalidFile ? '<p class="invalidFile">Arquivo inválido detectado!</p>' : ''}
     <form onsubmit="submitForm">
-      <div class="title">
-        <input id="title" type="text" value="${editing.title || ''}" required />
-      </div>
+      <div class="container-title">
+        <div class="title">
+          <label>Título</label>
+          <input id="title" type="text" value="${editing.title || ''}" required />
+        </div>
 
-      <div class="fileName">
-        <input id="fileName" type="text" value="${editing.fileName || ''}" required />
+        <div class="fileName">
+          <label>Nome do arquivo</label>
+          <input id="fileName" type="text" value="${editing.fileName || ''}" required />
+        </div>
       </div>
 
       <div class="description">
+        <label>Descrição</label>
         <textarea id="description" required>${editing.description || ''}</textarea>
       </div>
 
       ${!editing.title ? '<div class="file-input"><input id="file-input" type="file" required /></div>' : ''}
 
       <div class="button-wrapper">
-        <button type="submit">Enviar</button>
+        <button class="btn btn-primary" type="submit">Enviar</button>
       </div>
     </form>
   `
 
+  setTimeout(() => {
+    invalidFile = false
+    document.querySelector('.invalidFile').remove()
+  }, 2000)
   document.querySelector('.content').innerHTML = text
   document.querySelector('#file-input').addEventListener('change', (ev) => {
     onFileChange(ev)
