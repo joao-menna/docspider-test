@@ -9,6 +9,7 @@
 
 let isEditing = false
 let editing = {}
+const BASE_URL = 'http://localhost:8080'
 
 /**
  * Delete entry before serve para deletar e atualizar
@@ -24,6 +25,9 @@ async function deleteEntryBefore(id) {
  */
 async function showList() {
   let start = `
+    <div>
+      <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
+    </div>
     <table>
       <thead>
         <tr>
@@ -50,8 +54,8 @@ async function showList() {
           <td>${entry.fileName}</td>
           <td>${formatDate(entry.dateTime)}</td>
           <td class="botoes">
-            <i class="bi bi-pencil edit" name="showCadastro" data-arg1='${JSON.stringify(entry)}' onclick="buttonInvoke"></i>
-            <i class="bi bi-trash delete" name="deleteEntryBefore" data-arg1='${entry.id}' onclick="buttonInvoke"></i>
+            <i class="bi bi-pencil button" name="showCadastro" data-arg1='${JSON.stringify(entry)}'></i>
+            <i class="bi bi-trash button" name="deleteEntryBefore" data-arg1='${entry.id}'></i>
           </td>
         </tr>
     `
@@ -69,13 +73,19 @@ async function showList() {
   `
 
   document.querySelector('.content').innerHTML = text
+
+  document.querySelectorAll('.button').forEach((el) => {
+    el.addEventListener('click', (ev) => {
+      buttonInvoke(ev)
+    })
+  })
 }
 
 function buttonInvoke(event) {
-  let nameOfFunction = this[event.target.name]
+  let nameOfFunction = this[event.target.getAttribute('name')]
   let arg1 = event.target.getAttribute('data-arg1')
 
-  window[nameOfFunction](arg1)
+  nameOfFunction(arg1)
 }
 
 /**
@@ -83,18 +93,35 @@ function buttonInvoke(event) {
  * @param {string} entryStr
  */
 async function showCadastro(entryStr) {
-  if (entry) {
+  if (entryStr) {
     isEditing = true
     editing = JSON.parse(entryStr)
   }
 
   let text = `
+    <button class="btn btn-danger" onclick="showList()">Voltar</button>
     <form onsubmit="submitForm">
+      <div class="title">
+        <input type="text" value="${editing.title || ''}" />
+      </div>
+
+      <div class="description">
+        <input type="text" value="${editing.description || ''}" />
+      </div>
+
+      <div class="fileName">
+        <input type="text" value="${editing.fileName || ''}" />
+      </div>
+
+      ${!editing.title ? '<div class="file-input"><input type="file" /></div>' : ''}
     </form>
   `
 
-  console.log('abluble')
   document.querySelector('.content').innerHTML = text
+}
+
+function submitForm(event) {
+  event.preventDefault()
 }
 
 /**
@@ -126,7 +153,7 @@ async function getList() {
     }
   ]
 
-  const req = await fetch('https://localhost:8080/documents')
+  const req = await fetch(`${BASE_URL}/documents`)
   const json = await req.json()
   return json
 }
@@ -143,7 +170,7 @@ async function insertList(object) {
     body.append(key, object[key])
   }
 
-  const req = await fetch('https://localhost:8080/documents', {
+  const req = await fetch(`${BASE_URL}/documents`, {
     method: 'POST',
     body
   })
@@ -159,7 +186,7 @@ async function insertList(object) {
  * @returns {Promise<ListEntry>}
  */
 async function updateEntry(id, object) {
-  const req = await fetch(`https://localhost:8080/documents/${id}`, {
+  const req = await fetch(`${BASE_URL}/documents/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(object)
@@ -175,7 +202,7 @@ async function updateEntry(id, object) {
  * @returns {Promise<ListEntry>}
  */
 async function deleteEntry(id) {
-  const req = await fetch(`https://localhost:8080/documents/${id}`, {
+  const req = await fetch(`${BASE_URL}/documents/${id}`, {
     method: 'DELETE'
   })
   showList()
