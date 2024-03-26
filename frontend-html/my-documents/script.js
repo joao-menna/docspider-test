@@ -31,39 +31,12 @@ async function showList() {
       <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
     </div>
     <div class="cards">
-    <!-- <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>Descrição</th>
-          <th>Nome do Arquivo</th>
-          <th>Dt. Criação</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody> -->
   `
 
   const documentList = await getList()
 
   let list = ''
   for (const entry of documentList) {
-    // modo tabela
-    // list += `
-    //     <!-- <tr>
-    //       <td>${entry.id}</td>
-    //       <td>${entry.title}</td>
-    //       <td>${entry.description}</td>
-    //       <td>${entry.fileName}</td>
-    //       <td>${formatDate(entry.dateTime)}</td>
-    //       <td class="botoes">
-    //         <i class="bi bi-pencil button" name="showCadastro" data-arg1='${JSON.stringify(entry)}'></i>
-    //         <i class="bi bi-trash button" name="deleteEntryAction" data-arg1='${entry.id}'></i>
-    //       </td>
-    //     </tr> -->
-    // `
-    // modo card
     list += `
       <div class="card">
         <div class="card-body">
@@ -86,8 +59,6 @@ async function showList() {
   }
 
   let end = `
-      <!-- </tbody>
-    </table> -->
     </div>
   `
 
@@ -115,6 +86,7 @@ function downloadFile(entryFileName) {
   const a = document.createElement('a')
   a.href = `${BASE_URL}/static/${entryFileName}`
   a.download = entryFileName
+  a.setAttribute('target', '_blank')
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -171,13 +143,23 @@ async function showCadastro(entryStr) {
     </form>
   `
 
-  setTimeout(() => {
-    invalidFile = false
-    document.querySelector('.invalidFile').remove()
-  }, 2000)
+
+  if (invalidFile) {
+    setTimeout(() => {
+      invalidFile = false
+      document.querySelector('.invalidFile').remove()
+    }, 2000)
+  }
+
   document.querySelector('.content').innerHTML = text
+
   document.querySelector('#file-input').addEventListener('change', (ev) => {
     onFileChange(ev)
+  })
+
+  document.querySelector('form').addEventListener('submit', (ev) => {
+    ev.preventDefault()
+    submitForm()
   })
 }
 
@@ -204,11 +186,14 @@ function onFileChange(event) {
 
 /**
  * Função para quando o form for enviado
- * @param {*} event Evento de enviar form
  */
-function submitForm(event) {
-  event.preventDefault()
-  event.stopPropagation()
+async function submitForm() {
+  await insertList({
+    file: document.querySelector('#file-input').files[0],
+    title: document.querySelector('#title').value,
+    description: document.querySelector('#description').value,
+    fileName: document.querySelector('#fileName').value
+  })
   showList()
 }
 
@@ -217,29 +202,29 @@ function submitForm(event) {
  * @returns {Promise<ListEntry[]>}
  */
 async function getList() {
-  return [
-    {
-      id: 1,
-      title: 'minha foto',
-      description: 'minha foto',
-      fileName: 'minhafoto.png',
-      createdAt: '2024-03-25T17:40:00.000Z'
-    },
-    {
-      id: 2,
-      title: 'foto do gato',
-      description: 'foto do gato',
-      fileName: 'fotogato.png',
-      createdAt: '2024-03-25T17:40:00.000Z'
-    },
-    {
-      id: 3,
-      title: 'foto do cachorro',
-      description: 'foto do cachorro',
-      fileName: 'fotocachorro.png',
-      createdAt: '2024-03-25T17:40:00.000Z'
-    }
-  ]
+  // return [
+  //   {
+  //     id: 1,
+  //     title: 'minha foto',
+  //     description: 'minha foto',
+  //     fileName: 'minhafoto.png',
+  //     createdAt: '2024-03-25T17:40:00.000Z'
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'foto do gato',
+  //     description: 'foto do gato',
+  //     fileName: 'fotogato.png',
+  //     createdAt: '2024-03-25T17:40:00.000Z'
+  //   },
+  //   {
+  //     id: 3,
+  //     title: 'foto do cachorro',
+  //     description: 'foto do cachorro',
+  //     fileName: 'fotocachorro.png',
+  //     createdAt: '2024-03-25T17:40:00.000Z'
+  //   }
+  // ]
 
   const req = await fetch(`${BASE_URL}/documents`)
   const json = await req.json()
