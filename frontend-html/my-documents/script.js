@@ -115,13 +115,13 @@ async function showCadastro(entryStr) {
 
   let text = `
     <h4>Adicionar anexo</h4>
-    <button class="btn btn-secondary" onclick="showList()">Voltar</button>
+    <button class="btn btn-secondary" onclick="editing = {}; showList()">Voltar</button>
     ${invalidFile ? '<p class="invalidFile">Arquivo inválido detectado!</p>' : ''}
     <form onsubmit="submitForm">
       <div class="container-title">
         <div class="title">
           <label>Título</label>
-          <input id="title" type="text" value="${editing.title || ''}" required />
+          <input id="title" type="text" maxlength="100" value="${editing.title || ''}" required />
         </div>
 
         <div class="fileName">
@@ -132,7 +132,7 @@ async function showCadastro(entryStr) {
 
       <div class="description">
         <label>Descrição</label>
-        <textarea id="description" required>${editing.description || ''}</textarea>
+        <textarea id="description" maxlength="2000" required>${editing.description || ''}</textarea>
       </div>
 
       ${!editing.title ? '<div class="file-input"><input id="file-input" type="file" required /></div>' : ''}
