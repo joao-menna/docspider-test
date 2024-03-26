@@ -4,7 +4,7 @@
  * @property {string} title
  * @property {string} description
  * @property {string} fileName
- * @property {string} dateTime
+ * @property {string} createdAt
  */
 
 let isEditing = false
@@ -70,6 +70,7 @@ async function showList() {
           <h5 class="card-title">${entry.title}</h5>
           <h6 class="card-subtitle mb-2 text-body-secondary">${entry.fileName}</h6>
           <p class="card-text">${entry.description}</p>
+          <p class="createdAt">Criado em: ${formatDate(entry.createdAt)}</p>
           <button class="btn button" name="downloadFile" data-arg1='${entry.fileName}'>
             <i class="bi bi-download" name="downloadFile" data-arg1='${entry.fileName}'></i>
           </button>
@@ -222,21 +223,21 @@ async function getList() {
       title: 'minha foto',
       description: 'minha foto',
       fileName: 'minhafoto.png',
-      dateTime: '2024-03-25T17:40:00.000Z'
+      createdAt: '2024-03-25T17:40:00.000Z'
     },
     {
       id: 2,
       title: 'foto do gato',
       description: 'foto do gato',
       fileName: 'fotogato.png',
-      dateTime: '2024-03-25T17:40:00.000Z'
+      createdAt: '2024-03-25T17:40:00.000Z'
     },
     {
       id: 3,
       title: 'foto do cachorro',
       description: 'foto do cachorro',
       fileName: 'fotocachorro.png',
-      dateTime: '2024-03-25T17:40:00.000Z'
+      createdAt: '2024-03-25T17:40:00.000Z'
     }
   ]
 
