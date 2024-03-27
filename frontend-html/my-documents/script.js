@@ -10,10 +10,13 @@
 let isEditing = false
 let editing = {}
 let invalidFile = false
-const BASE_URL = 'http://localhost:8080'
+// Fastify
+// const BASE_URL = 'http://localhost:8080'
+// ASP.NET
+const BASE_URL = 'https://localhost:7091'
 
 /**
- * Delete entry before serve para deletar e atualizar
+ * Delete entry action serve para deletar e atualizar
  * @param {number} id
  */
 async function deleteEntryAction(id) {
