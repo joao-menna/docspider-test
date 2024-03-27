@@ -38,15 +38,15 @@ export default async function documentRoutes (fastify: FastifyInstance): Promise
       if (part.type === 'file') {
         file = await part.toBuffer()
       } else {
-        if (part.fieldname === 'title') {
+        if (part.fieldname === 'Title') {
           obj.title = part.value as string
         }
 
-        if (part.fieldname === 'description') {
+        if (part.fieldname === 'Description') {
           obj.description = part.value as string
         }
 
-        if (part.fieldname === 'fileName') {
+        if (part.fieldname === 'FileName') {
           obj.fileName = part.value as string
         }
       }

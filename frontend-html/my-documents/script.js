@@ -123,9 +123,9 @@ async function showCadastro(entryStr) {
 
   let text = `
     <h4>Adicionar anexo</h4>
-    <button class="btn btn-secondary" onclick="editing = {}; showList()">Voltar</button>
+    <button class="btn btn-secondary" onclick="isEditing = false; editing = {}; showList()">Voltar</button>
     ${invalidFile ? '<p class="invalidFile">Arquivo inválido detectado!</p>' : ''}
-    <form onsubmit="submitForm">
+    <form>
       <div class="container-title">
         <div class="title">
           <label>Título</label>
@@ -143,7 +143,7 @@ async function showCadastro(entryStr) {
         <textarea id="description" maxlength="2000" required>${editing.description || ''}</textarea>
       </div>
 
-      ${!editing.title ? '<div class="file-input"><input id="file-input" type="file" required /></div>' : ''}
+      ${!isEditing ? '<div class="file-input"><input id="file-input" type="file" required /></div>' : ''}
 
       <div class="button-wrapper">
         <button class="btn btn-primary" type="submit">Enviar</button>
@@ -161,9 +161,11 @@ async function showCadastro(entryStr) {
 
   document.querySelector('.content').innerHTML = text
 
-  document.querySelector('#file-input').addEventListener('change', (ev) => {
-    onFileChange(ev)
-  })
+  if (document.querySelector('#file-input')) {
+    document.querySelector('#file-input').addEventListener('change', (ev) => {
+      onFileChange(ev)
+    })
+  }
 
   document.querySelector('form').addEventListener('submit', (ev) => {
     ev.preventDefault()
@@ -196,12 +198,22 @@ function onFileChange(event) {
  * Função para quando o form for enviado
  */
 async function submitForm() {
-  await insertList({
-    file: document.querySelector('#file-input').files[0],
-    title: document.querySelector('#title').value,
-    description: document.querySelector('#description').value,
-    fileName: document.querySelector('#fileName').value
-  })
+  if (!isEditing) {
+    await insertEntry({
+      File: document.querySelector('#file-input').files[0],
+      Title: document.querySelector('#title').value,
+      Description: document.querySelector('#description').value,
+      FileName: document.querySelector('#fileName').value
+    })
+  } else {
+    await updateEntry(editing.id, {
+      title: document.querySelector('#title').value,
+      description: document.querySelector('#description').value,
+      fileName: document.querySelector('#fileName').value
+    })
+    editing = {}
+    isEditing = false
+  }
   showList()
 }
 
@@ -244,7 +256,7 @@ async function getList() {
  * @param {ListEntry} object 
  * @returns {Promise<ListEntry>}
  */
-async function insertList(object) {
+async function insertEntry(object) {
   const body = new FormData()
 
   for (const key of Object.keys(object)) {
