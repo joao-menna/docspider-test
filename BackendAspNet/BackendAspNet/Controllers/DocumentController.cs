@@ -1,6 +1,7 @@
 using BackendAspNet.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace BackendAspNet.Controllers
 {
@@ -36,9 +37,24 @@ namespace BackendAspNet.Controllers
         [HttpPost]
         public async Task<ActionResult<Document>> InsertDocument(Document document)
         {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "static");
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
             _context.Documents.Add(document);
             await _context.SaveChangesAsync();
 
+            if (document.File != null)
+            {
+                var fs = new FileStream(Path.Combine(path, document.FileName), FileMode.OpenOrCreate);
+                var file = Convert.FromBase64String(document.File);
+                fs.Write(file, 0, file.Length);
+                fs.Close();
+            }
+            
             return CreatedAtAction(nameof(GetDocument), new { id = document.Id }, document);
         }
 
