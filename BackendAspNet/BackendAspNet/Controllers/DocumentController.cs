@@ -24,14 +24,14 @@ namespace BackendAspNet.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Document>> GetDocument(int id)
         {
-            var product = await _context.Documents.FindAsync(id);
+            var document = await _context.Documents.FindAsync(id);
 
-            if (product == null)
+            if (document == null)
             {
                 return NotFound();
             }
 
-            return product;
+            return document;
         }
 
         [HttpPost]
@@ -62,7 +62,18 @@ namespace BackendAspNet.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDocument(int id, Document document)
         {
-            _context.Entry(document).State = EntityState.Modified;
+            var foundDocument = await _context.Documents.FindAsync(id);
+
+            if (foundDocument == null)
+            {
+                return NotFound();
+            }
+
+            foundDocument.Title = document.Title;
+            foundDocument.Description = document.Description;
+            foundDocument.FileName = document.FileName;
+
+            _context.Entry(foundDocument).State = EntityState.Modified;
 
             try
             {
@@ -81,6 +92,19 @@ namespace BackendAspNet.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Document>> DeleteDocument(int id)
+        {
+            var document = await _context.Documents.FindAsync(id);
+
+            if (document == null)
+            {
+                return NotFound();
+            }
+
+            
         }
 
         private bool DocumentExists(int id)
