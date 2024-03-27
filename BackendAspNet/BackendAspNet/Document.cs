@@ -15,7 +15,5 @@ namespace BackendAspNet
 
         [Required]
         public string FileName { get; set; }
-
-        public string? File { get; set; }
     }
 }

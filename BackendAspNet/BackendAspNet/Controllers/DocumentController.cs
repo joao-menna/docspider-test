@@ -35,7 +35,7 @@ namespace BackendAspNet.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Document>> InsertDocument(Document document)
+        public async Task<ActionResult<Document>> InsertDocument([FromForm] DocumentInsert document)
         {
             string path = Path.Combine(Directory.GetCurrentDirectory(), "static");
 
@@ -44,18 +44,19 @@ namespace BackendAspNet.Controllers
                 Directory.CreateDirectory(path);
             }
 
-            _context.Documents.Add(document);
+            var newDocument = new Document();
+            newDocument.Title = document.Title;
+            newDocument.Description = document.Description;
+            newDocument.FileName = document.FileName;
+
+            _context.Documents.Add(newDocument);
             await _context.SaveChangesAsync();
 
-            if (document.File != null)
-            {
-                var fs = new FileStream(Path.Combine(path, document.FileName), FileMode.OpenOrCreate);
-                var file = Convert.FromBase64String(document.File);
-                fs.Write(file, 0, file.Length);
-                fs.Close();
-            }
+            var fs = new FileStream(Path.Combine(path, document.FileName), FileMode.OpenOrCreate);
+            await document.File.CopyToAsync(fs);
+            fs.Close();
             
-            return CreatedAtAction(nameof(GetDocument), new { id = document.Id }, document);
+            return CreatedAtAction(nameof(GetDocument), new { id = newDocument.Id }, newDocument);
         }
 
         [HttpPut("{id}")]
