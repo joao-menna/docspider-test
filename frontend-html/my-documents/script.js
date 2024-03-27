@@ -33,7 +33,15 @@ async function showList() {
     <div class="cards">
   `
 
-  const documentList = await getList()
+  let documentList = []
+  try {
+    documentList = await getList()
+  } catch (err) {
+    const text = '<p>Algum erro ocorreu tentando pegar a lista!</p>'
+
+    document.querySelector('.content').innerHTML = text
+    return
+  }
 
   let list = ''
   for (const entry of documentList) {
