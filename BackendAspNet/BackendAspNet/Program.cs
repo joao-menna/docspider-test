@@ -4,8 +4,20 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var allowAllOrigins = "AllowAllOrigins";
+
 // Add services to the container.
 var services = builder.Services;
+
+services.AddCors(options =>
+{
+    options.AddPolicy(name: allowAllOrigins, policy =>
+    {
+        policy.WithMethods("GET", "POST", "PUT", "DELETE");
+        policy.WithHeaders("*");
+        policy.WithOrigins("*");
+    });
+});
 
 services.AddDbContext<DocumentContext>(options =>
 {
@@ -32,6 +44,8 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static")),
     RequestPath = "/static"
 });
+
+app.UseCors(allowAllOrigins);
 
 app.UseAuthorization();
 

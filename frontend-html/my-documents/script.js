@@ -54,7 +54,7 @@ async function showList() {
           <h5 class="card-title">${entry.title}</h5>
           <h6 class="card-subtitle mb-2 text-body-secondary">${entry.fileName}</h6>
           <p class="card-text">${entry.description}</p>
-          <p class="createdAt">Criado em: ${formatDate(entry.createdAt)}</p>
+          <p class="createdAt">Criado em: ${entry.createdAt ? formatDate(entry.createdAt) : ''}</p>
           <button class="btn button" name="downloadFile" data-arg1='${entry.fileName}'>
             <i class="bi bi-download" name="downloadFile" data-arg1='${entry.fileName}'></i>
           </button>
@@ -128,6 +128,7 @@ async function showCadastro(entryStr) {
     <h4>Adicionar anexo</h4>
     <button class="btn btn-secondary" onclick="isEditing = false; editing = {}; showList()">Voltar</button>
     ${invalidFile ? '<p class="invalidFile">Arquivo inválido detectado!</p>' : ''}
+    <p class="alertError" style="display: none;">Não é possível criar títulos duplicados!</p>
     <form>
       <div class="container-title">
         <div class="title">
@@ -201,23 +202,31 @@ function onFileChange(event) {
  * Função para quando o form for enviado
  */
 async function submitForm() {
-  if (!isEditing) {
-    await insertEntry({
-      File: document.querySelector('#file-input').files[0],
-      Title: document.querySelector('#title').value,
-      Description: document.querySelector('#description').value,
-      FileName: document.querySelector('#fileName').value
-    })
-  } else {
-    await updateEntry(editing.id, {
-      title: document.querySelector('#title').value,
-      description: document.querySelector('#description').value,
-      fileName: document.querySelector('#fileName').value
-    })
+  try {
+    if (!isEditing) {
+      await insertEntry({
+        File: document.querySelector('#file-input').files[0],
+        Title: document.querySelector('#title').value,
+        Description: document.querySelector('#description').value,
+        FileName: document.querySelector('#fileName').value
+      })
+    } else {
+      await updateEntry(editing.id, {
+        title: document.querySelector('#title').value,
+        description: document.querySelector('#description').value,
+        fileName: document.querySelector('#fileName').value
+      })
+    }
+
     editing = {}
     isEditing = false
+    showList()
+  } catch (err) {
+    document.querySelector('.alertError').style.display = 'block'
+    setTimeout(() => {
+      document.querySelector('.alertError').style.display = 'none'
+    }, 2000)
   }
-  showList()
 }
 
 /**
@@ -287,9 +296,6 @@ async function updateEntry(id, object) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(object)
   })
-
-  const json = await req.json()
-  return json
 }
 
 /**
@@ -309,9 +315,18 @@ async function deleteEntry(id) {
  * @param {string} dateTime dateTime em formato ISO 8601
  */
 function formatDate(dateTime) {
-  const [date, time] = dateTime.split('T')
-  const [year, month, day] = date.split('-')
-  const [hour, minute] = time.split(':')
+  // Achei que vinha nesse formato (ISO 8601) sem timezone, mas vem.
+  // Caso seja necessário, é só descomentar
+  // const [date, time] = dateTime.split('T')
+  // const [year, month, day] = date.split('-')
+  // const [hour, minute] = time.split(':')
+
+  const date = new Date(dateTime)
+  const day = date.getDate().toString()
+  const month = date.getMonth().toString()
+  const year = date.getFullYear()
+  const hour = date.getHours().toString()
+  const minute = date.getMinutes().toString()
 
   const dateStr = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
   const timeStr = `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`

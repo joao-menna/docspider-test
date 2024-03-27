@@ -50,7 +50,15 @@ namespace BackendAspNet.Controllers
             newDocument.FileName = document.FileName;
 
             _context.Documents.Add(newDocument);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             var fs = new FileStream(Path.Combine(path, document.FileName), FileMode.OpenOrCreate);
             await document.File.CopyToAsync(fs);

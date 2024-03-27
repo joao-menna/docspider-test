@@ -14,6 +14,7 @@ namespace BackendAspNet.Data
         {
             modelBuilder.Entity<Document>().ToTable("document");
             modelBuilder.Entity<Document>().HasIndex(d => d.Title).IsUnique();
+            modelBuilder.Entity<Document>().Property(d => d.CreatedAt).HasDefaultValueSql("NOW()");
         }
     }
 }
