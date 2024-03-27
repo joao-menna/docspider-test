@@ -13,6 +13,7 @@ namespace BackendAspNet.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Document>().ToTable("document");
+            modelBuilder.Entity<Document>().HasIndex(d => d.Title).IsUnique();
         }
     }
 }
