@@ -69,15 +69,21 @@ namespace BackendAspNet.Controllers
                 return NotFound();
             }
 
+            var oldFileName = foundDocument.FileName;
             foundDocument.Title = document.Title;
             foundDocument.Description = document.Description;
             foundDocument.FileName = document.FileName;
+
+            var staticPath = Path.Combine(Directory.GetCurrentDirectory(), "static");
 
             _context.Entry(foundDocument).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
+
+                var file = new FileInfo(Path.Combine(staticPath, oldFileName));
+                file.MoveTo(Path.Combine(staticPath, document.FileName));
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -104,7 +110,16 @@ namespace BackendAspNet.Controllers
                 return NotFound();
             }
 
-            
+            var oldFileName = document.FileName;
+
+            _context.Documents.Remove(document);
+            await _context.SaveChangesAsync();
+
+            var staticPath = Path.Combine(Directory.GetCurrentDirectory(), "static");
+            var file = new FileInfo(Path.Combine(staticPath, oldFileName));
+            file.Delete();
+
+            return NoContent();
         }
 
         private bool DocumentExists(int id)
