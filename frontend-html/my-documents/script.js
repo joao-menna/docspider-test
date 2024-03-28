@@ -15,9 +15,9 @@ let invalidFile = false
 
 // Selecionar o back-end
 // Fastify
-const BASE_URL = 'http://localhost:8080'
+// const BASE_URL = 'http://localhost:8080'
 // ASP.NET
-// const BASE_URL = 'https://localhost:7091'
+const BASE_URL = 'https://localhost:7091'
 
 /**
  * Mostra a tela de lista
