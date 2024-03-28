@@ -20,11 +20,11 @@ document.querySelector('.menu').addEventListener('click', (event) => {
     if (!on) {
       document.querySelector('.sidebar').style.left = '-217px'
       document.querySelector('.content').style.left = '63px'
-      document.querySelector('.content').style.width = '95%'
+      document.querySelector('.content').style.width = 'calc(100% - 63px)'
     } else {
       document.querySelector('.sidebar').style.left = '0'
       document.querySelector('.content').style.left = '280px'
-      document.querySelector('.content').style.width = '79vw'
+      document.querySelector('.content').style.width = 'calc(100% - 280px)'
     }
   }
 

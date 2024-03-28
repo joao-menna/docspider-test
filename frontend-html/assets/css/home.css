@@ -1,0 +1,31 @@
+/* Home */
+.main-card {
+  border-radius: 20px;
+  margin: 20px;
+}
+
+.background {
+  position: absolute;
+  height: 70vh;
+  width: 100%;
+}
+
+.background > img {
+  width: 100%;
+  height: 70vh;
+  object-fit: cover;
+  border-radius: 20px;
+  position: absolute;
+  opacity: 0.4;
+}
+
+.inner {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 40px;
+}

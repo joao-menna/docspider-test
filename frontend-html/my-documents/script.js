@@ -1,4 +1,5 @@
 /**
+ * Tipo da entrada da lista
  * @typedef {ListEntry}
  * @property {number?} id
  * @property {string} title
@@ -14,18 +15,9 @@ let invalidFile = false
 
 // Selecionar o back-end
 // Fastify
-// const BASE_URL = 'http://localhost:8080'
+const BASE_URL = 'http://localhost:8080'
 // ASP.NET
-const BASE_URL = 'https://localhost:7091'
-
-/**
- * Delete entry action serve para deletar e atualizar
- * @param {number} id
- */
-async function deleteEntryAction(id) {
-  await deleteEntry(id)
-  showList()
-}
+// const BASE_URL = 'https://localhost:7091'
 
 /**
  * Mostra a tela de lista
@@ -36,34 +28,41 @@ async function showList(renderOnlyList) {
   if (!renderOnlyList) {
     start = `
       <h4>Meus documentos</h4>
-      <div>
-        <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
-      </div>
-      <div class="filters">
-        <h5>Filtros</h5>
-        <div class="filter">
-          <label>Título</label>
-          <input id="filterTitle" type="text" />
+      <div class="top-actions">
+        <div class="filters">
+          <h5>Filtros</h5>
+          <div class="inner-filters">
+            <div class="filter">
+              <label>Título</label>
+              <input id="filterTitle" type="text" />
+            </div>
+            <div class="filter">
+              <label>Nome do arquivo</label>
+              <input id="filterFileName" type="text" />
+            </div>
+          </div>
         </div>
-        <div class="filter">
-          <label>Nome do arquivo</label>
-          <input id="filterFileName" type="text" />
+        <div>
+          <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
         </div>
       </div>
       <div class="cards">
     `
   }
 
-    let documentList = []
+  /**
+   * @type {ListEntry[]}
+   */
+  let documentList = []
 
-    try {
-      documentList = await getList()
-    } catch (err) {
-      const text = '<p>Algum erro ocorreu tentando pegar a lista!</p>'
+  try {
+    documentList = await getList()
+  } catch (err) {
+    const text = '<p>Algum erro ocorreu tentando pegar a lista!</p>'
 
-      document.querySelector('.content').innerHTML = text
-      return
-    }
+    document.querySelector('.content').innerHTML = text
+    return
+  }
 
   const filterTitle = document.querySelector('#filterTitle')
   const filterFileName = document.querySelector('#filterFileName')
@@ -137,35 +136,6 @@ async function showList(renderOnlyList) {
   })
 }
 
-function onChangeFilterTitle() {
-
-}
-
-/**
- * Baixar arquivo
- * @param {ListEntry} entry
- */
-function downloadFile(entryFileName) {
-  const a = document.createElement('a')
-  a.href = `${BASE_URL}/static/${entryFileName}`
-  a.download = entryFileName
-  a.setAttribute('target', '_blank')
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-}
-
-/**
- * Função para quando clicar no botão
- * @param {*} event Evento de clicar no botão
- */
-function buttonInvoke(event) {
-  let nameOfFunction = this[event.target.getAttribute('name')]
-  let arg1 = event.target.getAttribute('data-arg1')
-
-  nameOfFunction(arg1)
-}
-
 /**
  * Mostra a tela de cadastro, se tem parametro entryStr, ele vira tela de edição
  * @param {string} entryStr
@@ -201,12 +171,22 @@ async function showCadastro(entryStr) {
 
       ${!isEditing ? '<div class="file-input"><input id="file-input" type="file" required /></div>' : ''}
 
+      ${isEditing ? `
+        <div class="editing-actions">
+          <button type="button" class="btn button" name="downloadFile" data-arg1='${editing.fileName}'>
+            <i class="bi bi-download" name="downloadFile" data-arg1='${editing.fileName}'></i>
+          </button>
+          <button type="button" class="btn button" name="deleteEntryAction" data-arg1='${editing.id}' data-arg2="true">
+            <i class="bi bi-trash" name="deleteEntryAction" data-arg1='${editing.id}' data-arg2="true"></i>
+          </button>
+        </div>
+      ` : ''}
+
       <div class="button-wrapper">
         <button class="btn btn-primary" type="submit">Enviar</button>
       </div>
     </form>
   `
-
 
   if (invalidFile) {
     setTimeout(() => {
@@ -216,6 +196,13 @@ async function showCadastro(entryStr) {
   }
 
   document.querySelector('.content').innerHTML = text
+
+  document.querySelectorAll('.button').forEach((el) => {
+    el.addEventListener('click', (ev) => {
+      ev.stopPropagation()
+      buttonInvoke(ev)
+    })
+  })
 
   if (document.querySelector('#file-input')) {
     document.querySelector('#file-input').addEventListener('change', (ev) => {
@@ -227,6 +214,56 @@ async function showCadastro(entryStr) {
     ev.preventDefault()
     submitForm()
   })
+}
+
+/**
+ * Delete entry action serve para deletar e atualizar
+ * @param {number} id ID do registro para apagar
+ * @param {boolean?} isInEditScreen Determina se está na tela de edição
+ */
+async function deleteEntryAction(id, isInEditScreen) {
+  await deleteEntry(id)
+
+  if (isInEditScreen) {
+    isEditing = false
+    editing = {}
+  }
+
+  showList()
+}
+
+/**
+ * Baixar arquivo
+ * @param {ListEntry} entry
+ */
+function downloadFile(entryFileName) {
+  const a = document.createElement('a')
+  a.href = `${BASE_URL}/static/${entryFileName}`
+  a.download = entryFileName
+  a.setAttribute('target', '_blank')
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+
+// -------- EVENTOS --------
+
+
+/**
+ * Função para quando clicar no botão
+ * @param {*} event Evento de clicar no botão
+ */
+function buttonInvoke(event) {
+  let nameOfFunction = this[event.target.getAttribute('name')]
+  let arg1 = event.target.getAttribute('data-arg1')
+  let arg2 = event.target.getAttribute('data-arg2')
+
+  if (!arg2) {
+    nameOfFunction(arg1)
+  } else {
+    nameOfFunction(arg1, arg2)
+  }
 }
 
 /**
@@ -279,111 +316,6 @@ async function submitForm() {
       document.querySelector('.alertError').style.display = 'none'
     }, 2000)
   }
-}
-
-/**
- * Busca a lista de documentos
- * @returns {Promise<ListEntry[]>}
- */
-async function getList() {
-  // return [
-  //   {
-  //     id: 1,
-  //     title: 'minha foto',
-  //     description: 'minha foto',
-  //     fileName: 'minhafoto.png',
-  //     createdAt: '2024-03-25T17:40:00.000Z'
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'foto do gato',
-  //     description: 'foto do gato',
-  //     fileName: 'fotogato.png',
-  //     createdAt: '2024-03-25T17:40:00.000Z'
-  //   },
-  //   {
-  //     id: 3,
-  //     title: 'foto do cachorro',
-  //     description: 'foto do cachorro',
-  //     fileName: 'fotocachorro.png',
-  //     createdAt: '2024-03-25T17:40:00.000Z'
-  //   }
-  // ]
-
-  const req = await fetch(`${BASE_URL}/documents`)
-  const json = await req.json()
-  return json
-}
-
-/**
- * Insere uma entrada nos documentos
- * @param {ListEntry} object 
- * @returns {Promise<ListEntry>}
- */
-async function insertEntry(object) {
-  const body = new FormData()
-
-  for (const key of Object.keys(object)) {
-    body.append(key, object[key])
-  }
-
-  const req = await fetch(`${BASE_URL}/documents`, {
-    method: 'POST',
-    body
-  })
-
-  const json = await req.json()
-  return json
-}
-
-/**
- * Atualiza uma entrada nos documentos
- * @param {number} id
- * @param {ListEntry} object 
- * @returns {Promise<ListEntry>}
- */
-async function updateEntry(id, object) {
-  const req = await fetch(`${BASE_URL}/documents/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(object)
-  })
-}
-
-/**
- * Deleta uma entrada nos documentos
- * @param {number} id 
- * @returns {Promise<ListEntry>}
- */
-async function deleteEntry(id) {
-  const req = await fetch(`${BASE_URL}/documents/${id}`, {
-    method: 'DELETE'
-  })
-  showList()
-}
-
-/**
- * Converte data para formato apresentável (dd/mm/yyyy hh:MM)
- * @param {string} dateTime dateTime em formato ISO 8601
- */
-function formatDate(dateTime) {
-  // Achei que vinha nesse formato (ISO 8601) sem timezone, mas vem com tal.
-  // Caso seja necessário, é só descomentar
-  // const [date, time] = dateTime.split('T')
-  // const [year, month, day] = date.split('-')
-  // const [hour, minute] = time.split(':')
-
-  const date = new Date(dateTime)
-  const day = date.getDate().toString()
-  const month = date.getMonth().toString()
-  const year = date.getFullYear()
-  const hour = date.getHours().toString()
-  const minute = date.getMinutes().toString()
-
-  const dateStr = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
-  const timeStr = `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`
-
-  return `${dateStr} ${timeStr}`
 }
 
 showList()

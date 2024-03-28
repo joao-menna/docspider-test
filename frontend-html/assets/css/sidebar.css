@@ -1,0 +1,34 @@
+.sidebar {
+  position: fixed;
+  /* height: 100%; */
+  width: 280px;
+  top: 60px;
+  bottom: 0;
+  transition: 200ms;
+  z-index: 10;
+}
+
+.sidebar > nav {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: whitesmoke;
+  height: 100%;
+}
+
+nav > a {
+  display: flex;
+  gap: 80px;
+  justify-content: space-between;
+  text-decoration: none;
+  color: black;
+  align-items: center;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+a > i {
+  font-size: larger;
+}
