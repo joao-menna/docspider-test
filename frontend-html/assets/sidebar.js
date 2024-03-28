@@ -8,7 +8,7 @@ window.addEventListener('resize', (ev) => {
   isMobile = window.innerWidth < MOBILE_THRESHOLD
 
   if (isMobile !== lastIsMobile) {
-    on = true
+    on = !on
     document.querySelector('.menu').click()
   }
 })

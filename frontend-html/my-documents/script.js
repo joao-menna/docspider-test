@@ -7,9 +7,12 @@
  * @property {string} createdAt
  */
 
+// Variáveis compartilhadas
 let isEditing = false
 let editing = {}
 let invalidFile = false
+
+// Selecionar o back-end
 // Fastify
 // const BASE_URL = 'http://localhost:8080'
 // ASP.NET
@@ -26,30 +29,63 @@ async function deleteEntryAction(id) {
 
 /**
  * Mostra a tela de lista
+ * @param {boolean?} renderOnlyList Renderizar apenas a lista, usado para filtros
  */
-async function showList() {
-  let start = `
-    <h4>Meus documentos</h4>
-    <div>
-      <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
-    </div>
-    <div class="cards">
-  `
-
-  let documentList = []
-  try {
-    documentList = await getList()
-  } catch (err) {
-    const text = '<p>Algum erro ocorreu tentando pegar a lista!</p>'
-
-    document.querySelector('.content').innerHTML = text
-    return
+async function showList(renderOnlyList) {
+  let start
+  if (!renderOnlyList) {
+    start = `
+      <h4>Meus documentos</h4>
+      <div>
+        <button class="btn btn-primary" onclick="showCadastro()">Criar novo</button>
+      </div>
+      <div class="filters">
+        <h5>Filtros</h5>
+        <div class="filter">
+          <label>Título</label>
+          <input id="filterTitle" type="text" />
+        </div>
+        <div class="filter">
+          <label>Nome do arquivo</label>
+          <input id="filterFileName" type="text" />
+        </div>
+      </div>
+      <div class="cards">
+    `
   }
+
+    let documentList = []
+
+    try {
+      documentList = await getList()
+    } catch (err) {
+      const text = '<p>Algum erro ocorreu tentando pegar a lista!</p>'
+
+      document.querySelector('.content').innerHTML = text
+      return
+    }
+
+  const filterTitle = document.querySelector('#filterTitle')
+  const filterFileName = document.querySelector('#filterFileName')
 
   let list = ''
   for (const entry of documentList) {
+    if (filterTitle && filterFileName) {
+      if (filterTitle.value) {
+        if (!entry.title.includes(filterTitle.value)) {
+          continue
+        }
+      }
+
+      if (filterFileName.value) {
+        if (!entry.fileName.includes(filterFileName.value)) {
+          continue
+        }
+      }
+    }
+
     list += `
-      <div class="card">
+      <div class="card" id="card-entry-${entry.id}">
         <div class="card-body">
           <h5 class="card-title">${entry.title}</h5>
           <h6 class="card-subtitle mb-2 text-body-secondary">${entry.fileName}</h6>
@@ -69,17 +105,29 @@ async function showList() {
     `
   }
 
-  let end = `
-    </div>
-  `
+  if (!renderOnlyList) {
+    let end = `
+      </div>
+    `
 
-  const text = `
-    ${start}
-    ${list}
-    ${end}
-  `
+    const text = `
+      ${start}
+      ${list}
+      ${end}
+    `
 
-  document.querySelector('.content').innerHTML = text
+    document.querySelector('.content').innerHTML = text
+
+    document.querySelector('#filterTitle').addEventListener('input', () => {
+      showList(true)
+    })
+
+    document.querySelector('#filterFileName').addEventListener('input', () => {
+      showList(true)
+    })
+  } else {
+    document.querySelector('.cards').innerHTML = list
+  }
 
   document.querySelectorAll('.button').forEach((el) => {
     el.addEventListener('click', (ev) => {
@@ -87,6 +135,10 @@ async function showList() {
       buttonInvoke(ev)
     })
   })
+}
+
+function onChangeFilterTitle() {
+
 }
 
 /**
@@ -315,7 +367,7 @@ async function deleteEntry(id) {
  * @param {string} dateTime dateTime em formato ISO 8601
  */
 function formatDate(dateTime) {
-  // Achei que vinha nesse formato (ISO 8601) sem timezone, mas vem.
+  // Achei que vinha nesse formato (ISO 8601) sem timezone, mas vem com tal.
   // Caso seja necessário, é só descomentar
   // const [date, time] = dateTime.split('T')
   // const [year, month, day] = date.split('-')
