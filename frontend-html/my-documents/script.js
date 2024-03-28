@@ -13,15 +13,20 @@ const LIMIT_PER_PAGE = 5
 
 // Selecionar o back-end
 // Fastify
-const BASE_URL = 'http://localhost:8080'
+// const BASE_URL = 'http://localhost:8080'
 // ASP.NET
-// const BASE_URL = 'https://localhost:7091'
+const BASE_URL = 'https://localhost:7091'
 
 // Variáveis compartilhadas
 let isEditing = false
 let editing = {}
 let invalidFile = false
 let page = 0
+
+/**
+ * @type {ListEntry[]}
+ */
+let originalDocumentList = []
 
 /**
  * Mostra a tela de lista
@@ -65,15 +70,18 @@ async function showList(renderOnlyList) {
   /**
    * @type {ListEntry[]}
    */
-  let documentList = []
+  let documentList = originalDocumentList
 
-  try {
-    documentList = await getList()
-  } catch (err) {
-    const text = '<p>Algum erro ocorreu tentando pegar a lista!</p>'
+  if (!renderOnlyList) {
+    try {
+      documentList = await getList()
+      originalDocumentList = documentList
+    } catch (err) {
+      const text = '<p>Algum erro ocorreu tentando pegar a lista!</p>'
 
-    document.querySelector('.content').innerHTML = text
-    return
+      document.querySelector('.content').innerHTML = text
+      return
+    }
   }
 
   const filterTitle = document.querySelector('#filterTitle')

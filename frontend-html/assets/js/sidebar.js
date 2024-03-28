@@ -15,28 +15,30 @@ window.addEventListener('resize', (ev) => {
 
 document.querySelector('.menu').addEventListener('click', (event) => {
   on = !on
+  const sidebar = document.querySelector('.sidebar')
+  const content = document.querySelector('.content')
 
   if (!isMobile) {
     if (!on) {
-      document.querySelector('.sidebar').style.left = '-217px'
-      document.querySelector('.content').style.left = '63px'
-      document.querySelector('.content').style.width = 'calc(100% - 63px)'
+      sidebar.style.left = '-217px'
+      content.style.left = '63px'
+      content.style.width = 'calc(100% - 63px)'
     } else {
-      document.querySelector('.sidebar').style.left = '0'
-      document.querySelector('.content').style.left = '280px'
-      document.querySelector('.content').style.width = 'calc(100% - 280px)'
+      sidebar.style.left = '0'
+      content.style.left = '280px'
+      content.style.width = 'calc(100% - 280px)'
     }
   }
 
   if (isMobile) {
     if (!on) {
-      document.querySelector('.sidebar').style.left = '-280px'
-      document.querySelector('.content').style.left = '0'
-      document.querySelector('.content').style.width = '100%'
+      sidebar.style.left = '-280px'
+      content.style.left = '0'
+      content.style.width = '100%'
     } else {
-      document.querySelector('.sidebar').style.left = '0'
-      document.querySelector('.content').style.left = '0'
-      document.querySelector('.content').style.width = '100%'
+      sidebar.style.left = '0'
+      content.style.left = '0'
+      content.style.width = '100%'
     }
   }
 })
