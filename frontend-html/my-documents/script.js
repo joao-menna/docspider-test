@@ -40,6 +40,14 @@ async function showList(renderOnlyList) {
               <label>Nome do arquivo</label>
               <input id="filterFileName" type="text" />
             </div>
+            <div class="filter">
+              <label>Ordernar por</label>
+              <select id="orderList">
+                <option value="title" selected>Título</option>
+                <option value="fileName">Nome do arquivo</option>
+                <option value="dateTime">Data e hora da criação</option>
+              </select>
+            </div>
           </div>
         </div>
         <div>
@@ -66,6 +74,34 @@ async function showList(renderOnlyList) {
 
   const filterTitle = document.querySelector('#filterTitle')
   const filterFileName = document.querySelector('#filterFileName')
+  const orderList = document.querySelector('#orderList')
+
+  documentList.sort((a, b) => (
+    a.title.localeCompare(b.title)
+  ))
+
+  if (orderList) {
+    if (orderList.value === 'title') {
+      documentList.sort((a, b) => (
+        a.title.localeCompare(b.title)
+      ))
+    }
+
+    if (orderList.value === 'fileName') {
+      documentList.sort((a, b) => (
+        a.fileName.localeCompare(b.fileName)
+      ))
+    }
+
+    if (orderList.value === 'dateTime') {
+      documentList.sort((a, b) => {
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
+
+        return dateA.getTime() - dateB.getTime()
+      })
+    }
+  }
 
   let list = ''
   for (const entry of documentList) {
@@ -122,6 +158,10 @@ async function showList(renderOnlyList) {
     })
 
     document.querySelector('#filterFileName').addEventListener('input', () => {
+      showList(true)
+    })
+
+    document.querySelector('#orderList').addEventListener('change', () => {
       showList(true)
     })
   } else {

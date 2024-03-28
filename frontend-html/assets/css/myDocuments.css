@@ -75,6 +75,12 @@ form {
   align-items: flex-start;
 }
 
+.filter > select {
+  background-color: white;
+  border: 1px solid rgb(193, 193, 193);
+  height: 28px;
+}
+
 .filter > input {
   border: 1px solid rgb(193, 193, 193);
 }
