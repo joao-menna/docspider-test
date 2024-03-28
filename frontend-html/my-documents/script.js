@@ -8,16 +8,20 @@
  * @property {string} createdAt
  */
 
+// Constantes
+const LIMIT_PER_PAGE = 5
+
+// Selecionar o back-end
+// Fastify
+const BASE_URL = 'http://localhost:8080'
+// ASP.NET
+// const BASE_URL = 'https://localhost:7091'
+
 // Variáveis compartilhadas
 let isEditing = false
 let editing = {}
 let invalidFile = false
-
-// Selecionar o back-end
-// Fastify
-// const BASE_URL = 'http://localhost:8080'
-// ASP.NET
-const BASE_URL = 'https://localhost:7091'
+let page = 0
 
 /**
  * Mostra a tela de lista
@@ -103,22 +107,30 @@ async function showList(renderOnlyList) {
     }
   }
 
-  let list = ''
-  for (const entry of documentList) {
+  documentList = documentList.filter((val) => {
     if (filterTitle && filterFileName) {
       if (filterTitle.value) {
-        if (!entry.title.includes(filterTitle.value)) {
-          continue
+        if (!val.title.includes(filterTitle.value)) {
+          return false
         }
       }
 
       if (filterFileName.value) {
-        if (!entry.fileName.includes(filterFileName.value)) {
-          continue
+        if (!val.fileName.includes(filterFileName.value)) {
+          return false
         }
       }
     }
 
+    return true
+  })
+
+  const startIndex = page * LIMIT_PER_PAGE
+  const endIndex = startIndex + LIMIT_PER_PAGE
+  const paginatedList = documentList.slice(startIndex, endIndex)
+
+  let list = ''
+  for (const entry of paginatedList) {
     list += `
       <div class="card" id="card-entry-${entry.id}">
         <div class="card-body">
@@ -140,8 +152,29 @@ async function showList(renderOnlyList) {
     `
   }
 
+  const paginationText = `
+    <button
+      class="btn btn-secondary paginationBtn"
+      name="goToPage"
+      data-arg1="${page - 1}"
+      data-arg2="${documentList.length}"
+    >Anterior</button>
+
+    <span id="pageCounter">${page + 1}</span>
+
+    <button
+      class="btn btn-secondary paginationBtn"
+      name="goToPage"
+      data-arg1="${page + 1}"
+      data-arg2="${documentList.length}"
+    >Próximo</button>
+  `
+
   if (!renderOnlyList) {
     let end = `
+      </div>
+      <div class="pagination">
+        ${paginationText}
       </div>
     `
 
@@ -164,9 +197,20 @@ async function showList(renderOnlyList) {
     document.querySelector('#orderList').addEventListener('change', () => {
       showList(true)
     })
+
   } else {
     document.querySelector('.cards').innerHTML = list
+    document.querySelector('.pagination').innerHTML = paginationText
   }
+
+  document.querySelector('#pageCounter').innerText = `${page + 1}`
+
+  document.querySelectorAll('.paginationBtn').forEach((el) => {
+    el.addEventListener('click', (ev) => {
+      ev.stopPropagation()
+      buttonInvoke(ev)
+    })
+  })
 
   document.querySelectorAll('.button').forEach((el) => {
     el.addEventListener('click', (ev) => {
@@ -257,22 +301,6 @@ async function showCadastro(entryStr) {
 }
 
 /**
- * Delete entry action serve para deletar e atualizar
- * @param {number} id ID do registro para apagar
- * @param {boolean?} isInEditScreen Determina se está na tela de edição
- */
-async function deleteEntryAction(id, isInEditScreen) {
-  await deleteEntry(id)
-
-  if (isInEditScreen) {
-    isEditing = false
-    editing = {}
-  }
-
-  showList()
-}
-
-/**
  * Baixar arquivo
  * @param {ListEntry} entry
  */
@@ -304,6 +332,40 @@ function buttonInvoke(event) {
   } else {
     nameOfFunction(arg1, arg2)
   }
+}
+
+/**
+ * Delete entry action serve para deletar e atualizar
+ * @param {number} id ID do registro para apagar
+ * @param {boolean?} isInEditScreen Determina se está na tela de edição
+ */
+async function deleteEntryAction(id, isInEditScreen) {
+  await deleteEntry(id)
+
+  if (isInEditScreen) {
+    isEditing = false
+    editing = {}
+  }
+
+  showList()
+}
+
+/**
+ * Vai para a página especificada da lista
+ * @param {string} newPageStr Novo index da página em string
+ * @param {number} documentListLength Tamanho da lista de documentos
+ */
+function goToPage(newPageStr, documentListLength) {
+  const maxPages = Math.ceil(documentListLength / LIMIT_PER_PAGE)
+  const newPage = parseInt(newPageStr)
+
+  if (newPage < 0 || newPage > maxPages - 1) {
+    return
+  }
+
+  page = newPage
+
+  showList(true)
 }
 
 /**

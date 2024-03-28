@@ -1,7 +1,7 @@
 document.querySelector('.content').innerHTML = `
   <div class="main-card">
     <div class="background">
-      <img src="/assets/images/home.png" />
+      <img src="/assets/images/home.png" alt="imagem de fundo" />
     </div>
     <div class="inner">
       <h2 class="inner-title">MennaDocs</h2>
