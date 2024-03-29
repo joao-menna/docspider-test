@@ -38,10 +38,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+var staticPath = Path.Combine(Directory.GetCurrentDirectory(), "static");
+if (!Directory.Exists(staticPath))
+{
+    Directory.CreateDirectory(staticPath);
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static")),
+    FileProvider = new PhysicalFileProvider(staticPath),
     RequestPath = "/static"
 });
 
