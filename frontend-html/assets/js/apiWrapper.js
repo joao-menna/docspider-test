@@ -3,30 +3,6 @@
  * @returns {Promise<ListEntry[]>}
  */
 async function getList() {
-  // return [
-  //   {
-  //     id: 1,
-  //     title: 'minha foto',
-  //     description: 'minha foto',
-  //     fileName: 'minhafoto.png',
-  //     createdAt: '2024-03-25T17:40:00.000Z'
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'foto do gato',
-  //     description: 'foto do gato',
-  //     fileName: 'fotogato.png',
-  //     createdAt: '2024-03-25T17:40:00.000Z'
-  //   },
-  //   {
-  //     id: 3,
-  //     title: 'foto do cachorro',
-  //     description: 'foto do cachorro',
-  //     fileName: 'fotocachorro.png',
-  //     createdAt: '2024-03-25T17:40:00.000Z'
-  //   }
-  // ]
-
   const req = await fetch(`${BASE_URL}/documents`)
   const json = await req.json()
   return json
