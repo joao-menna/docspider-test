@@ -1,40 +1,30 @@
 # docspider-test
+
 Teste para a Docspider, feito em C# com ASP.NET, JavaScript Vanilla e Bootstrap
 
 
 ## Como foi fazer este projeto?
 
-Foi uma experiência diferente, pois nunca tinha mexido com ASP.NET, apesar de ter mexido relativamente bastante com C#, foi apenas para criação de jogos, então tive que me virar para fazer.
+Foi uma experiência estimulante, pois nunca havia mexido com ASP.NET, apesar de ter utilizado relativamente bastante com C#, foi apenas para criação de jogos, então fui forçado a me desafiar.
 
-Estava com pouca prática com JavaScript Vanilla. Escolhi fazer com Vanilla pois não sei mexer com JQuery eficientemente.
-
-
-## Por que tem dois back-ends (Fastify e ASP.NET)?
-
-Eu passo a maioria do tempo que estou no computador usando Linux. É Linux no trabalho e dual-boot em casa, os únicos lugares que eu tinha para mexer no Windows era na faculdade e conectando via AnyDesk no meu computador ligado em casa. Como vocês devem saber, não é uma experiência tão legal desenvolver C# no Linux, por isso fiz esse back-end, eu precisava testar meu front-end integrando com back-end.
+Dei preferência por utilizar JavaScript Vanilla, devido ao meu conhecimento de JQuery não ser elevado e ao prazo de entrega do projeto.
 
 
-## Como rodar os projetos?
+## Por que existem dois back-ends (Fastify e ASP.NET)?
+
+Nos computadores que utilizo, dei preferência por utilizar Linux. Através de dual-boot no computador de casa, utilizei Windows para instalação do ambiente de desenvolvimento e criação / testes do projeto. A partir da faculdade, consegui desenvolver meu sistema utilizando o AnyDesk, para conexão remota. Não é uma boa experiência desenvolver C# no Linux, por isso houve a necessidade de criar um segundo back-end para testes no sistema operacional.
+
+
+## Como executar os projetos?
 
 Pré-requisitos gerais:
-- PostgreSQL (para o desenvolvimento foi usada a versão 16.2)
+- PostgreSQL 16.2+
+
 
 ### frontend-html
 
-É possível subir o projeto num servidor HTTP como Apache ou Nginx. Para o desenvolvimento, foi usado a extensão Live Server no VS Code. O projeto foi subido no Vercel e está disponível no link [https://docspider-test.vercel.app](https://docspider-test.vercel.app). O front-end subido está apontando para o back-end do ASP.NET ([https://localhost:7091](https://localhost:7091))
+É possível subir o projeto num servidor HTTP como Apache ou Nginx. Para o desenvolvimento, foi utilizado a extensão Live Server no VS Code. O projeto foi carregado no Vercel e está disponível no link [https://docspider-test.vercel.app](https://docspider-test.vercel.app). O front-end que está rodando aponta para o back-end do ASP.NET ([https://localhost:7091](https://localhost:7091))
 
-### backend-fastify
-
-Pré-requisitos:
-- Node 18+
-- NPM
-
-Passo a passo:
-1. Entre na pasta `backend-fastify`;
-1. Rode as migrations manualmente no banco de dados. Devido ao Drizzle-ORM, as migrations são guardadas em .SQL na pasta `drizzle/`;
-1. Copie o `.env.example` para `.env` e coloque as chaves necessárias;
-1. Rode `npm install` para baixar todas as dependências;
-1. Inicie o servidor com o comando `npm start`.
 
 ### BackendAspNet
 
@@ -44,7 +34,23 @@ Pré-requisitos:
 
 Passo a passo:
 1. Entre na pasta `BackendAspNet/BackendAspNet`;
-1. Rode o comando `dotnet restore` para baixar as dependências;
-1. Edite o appsettings.json, preenchendo o `ConnectionStrings > DefaultConnection` com sua connection string para o banco de dados seguindo o seguinte modelo: `Host=<>;Port=<>;Username=<>;Password=<>;Database=<>`, troque os `<>` pelo seu respectivo dado;
-1. Rode o comando `dotnet ef database update` para rodar as migrations;
+1. Execute o comando `dotnet restore` para baixar as dependências;
+1. Edite o arquivo `appsettings.json`, preenchendo o `ConnectionStrings > DefaultConnection` com sua string de conexão para a fonte de dados seguindo o modelo: `Host=<>;Port=<>;Username=<>;Password=<>;Database=<>`, substitua os `<>` pelos seus respectivos dados;
+1. Execute o comando `dotnet ef database update` para atualizar o banco de dados com as migrações;
 1. Inicie o servidor com o comando `dotnet run`.
+
+Obs.: Decidi utilizar o dotnet 6.0 devido à essa versão ser a única disponível na faculdade.
+
+
+### backend-fastify (caso queira testar o projeto em Linux)
+
+Pré-requisitos:
+- Node 18+
+- NPM
+
+Passo a passo:
+1. Entre na pasta `backend-fastify`;
+1. Execute as migrações manualmente no banco de dados. Devido ao Drizzle-ORM, as migrações do banco de dados são guardadas em .SQL na pasta `drizzle/`;
+1. Copie o `.env.example` para `.env` e coloque as chaves necessárias;
+1. Execute `npm install` para baixar todas as dependências;
+1. Inicie o servidor com o comando `npm start`.
