@@ -30,7 +30,7 @@ header {
 main {
   position: relative;
   display: flex;
-  /* width: calc(100% - 280px); */
+  overflow-x: hidden;
   width: 100%;
   top: 60px;
   bottom: 0;
